@@ -1,3 +1,4 @@
+use reqwest::Client;
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 
@@ -28,6 +29,18 @@ fn handle_client(mut stream: TcpStream) {
         }
     }
 }
+async fn validate_html(html: &str) -> Result<bool, reqwest::Error> {
+    let client = Client::new();
+    let response = client
+        .post("https://validator.w3.org/nu/")
+        .header("Content-Type", "text/html; charset=utf-8")
+        .body(html.to_string())
+        .send()
+        .await?;
+
+    let response_text = response.text().await?;
+    Ok(!response_text.contains("error"))
+}
 
 fn generate_html() -> String {
     let html = r#"
@@ -47,7 +60,7 @@ fn generate_html() -> String {
 }
 
 fn main() -> std::io::Result<()> {
-    let listener = TcpListener::bind("127.0.0.1:8080")?;
+    let listener = TcpListener::bind("localhost:8080")?;
     println!("Server listening on port 8080...");
 
     for stream in listener.incoming() {
@@ -55,4 +68,3 @@ fn main() -> std::io::Result<()> {
     }
     Ok(())
 }
-
