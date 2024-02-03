@@ -1,8 +1,10 @@
+use actix_web::{get, web, App, HttpServer, Responder};
 use reqwest::Client;
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 
 fn handle_client(mut stream: TcpStream) {
+    print!("THis is main");
     let mut buf = [0; 1024];
     loop {
         match stream.read(&mut buf) {
@@ -29,6 +31,12 @@ fn handle_client(mut stream: TcpStream) {
         }
     }
 }
+
+#[get("/hello")]
+async fn hell() -> impl Responder {
+    "Hello world"
+}
+
 async fn validate_html(html: &str) -> Result<bool, reqwest::Error> {
     let client = Client::new();
     let response = client
@@ -43,7 +51,7 @@ async fn validate_html(html: &str) -> Result<bool, reqwest::Error> {
 }
 
 fn generate_html() -> String {
-    let html = r#"
+    let page_html = r#"
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -56,7 +64,7 @@ fn generate_html() -> String {
     </body>
     </html>
     "#;
-    html.to_string()
+    page_html.to_string()
 }
 
 fn main() -> std::io::Result<()> {
