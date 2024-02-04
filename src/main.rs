@@ -1,4 +1,4 @@
-use actix_web::{get, web, App, HttpServer, Responder};
+use actix_web::{get, Responder};
 use reqwest::Client;
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
